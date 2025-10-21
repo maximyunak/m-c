@@ -332,6 +332,7 @@ main {
   justify-content: space-between;
   margin-top: 20px;
   gap: 10px;
+  flex-direction: column;
 }
 
 .like-btn {
@@ -687,4 +688,50 @@ footer {
   font-size: 18px;
   max-width: 600px;
   margin: 0 auto 30px;
+}
+
+.notify {
+  background: #ff3e3e;
+  color: white;
+  position: fixed;
+  right: 15px;
+  bottom: 15px;
+  padding: 8px;
+  border-radius: 8px;
+  transform: translateY(200px);
+  max-width: 300px;
+}
+
+.notify.green {
+  background: #0fc34a;
+}
+
+.notify.active {
+  transform: translateY(0);
+}
+
+* {
+  transition: 0.3s ease-in-out;
+}
+
+.error {
+  color: #ff3e3e;
+}
+
+@keyframes error {
+  0% {
+    transform: translateY(4px);
+  }
+  25% {
+    transform: translateY(-3px);
+  }
+  50% {
+    transform: translateY(2px);
+  }
+  75% {
+    transform: translateY(-1px);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }

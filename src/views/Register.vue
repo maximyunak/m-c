@@ -1,19 +1,15 @@
 <script setup>
-import api from '@/utils/api'
-import { ref } from 'vue'
+import $fetch from '@/utils/api'
+import { useRouter } from 'vue-router'
 
-const email = ref('')
-const password = ref('')
-const nickname = ref('')
+const router = useRouter()
 
-const submit = async () => {
-  const res = api.post('/register', {
-    email: email.value,
-    password: password.value,
-    nickname: nickname.value,
-  })
+const submit = async (event) => {
+  const res = await $fetch('/register', 'post', new FormData(event.target))
 
-  console.log(res)
+  if (res.user) {
+    router.push('/login')
+  }
 }
 </script>
 
@@ -23,42 +19,20 @@ const submit = async () => {
     <form @submit.prevent="submit" id="register-form">
       <div class="form-group">
         <label for="register-email">Email</label>
-        <input
-          v-model="email"
-          type="email"
-          id="register-email"
-          class="form-control"
-          placeholder="Введите ваш email"
-        />
-        <div v-if="email.length === 0" class="error-message">
-          <i class="fas fa-exclamation-circle"></i> Ошибка валидации
-        </div>
+        <input type="email" name="email" class="form-control" placeholder="Введите ваш email" />
       </div>
       <div class="form-group">
         <label for="register-username">Никнейм</label>
-        <input
-          v-model="nickname"
-          type="text"
-          id="register-username"
-          class="form-control"
-          placeholder="Введите ваш никнейм"
-        />
-        <div v-if="nickname.length === 0" class="error-message">
-          <i class="fas fa-exclamation-circle"></i> Ошибка валидации
-        </div>
+        <input type="text" name="nickname" class="form-control" placeholder="Введите ваш никнейм" />
       </div>
       <div class="form-group">
         <label for="register-password">Пароль</label>
         <input
-          v-model="password"
           type="password"
-          id="register-password"
+          name="password"
           class="form-control"
           placeholder="Придумайте надежный пароль"
         />
-        <div v-if="password.length === 0" class="error-message">
-          <i class="fas fa-exclamation-circle"></i> Ошибка валидации
-        </div>
       </div>
       <button type="submit" class="btn btn-block">
         <i class="fas fa-user-plus"></i> Зарегистрироваться

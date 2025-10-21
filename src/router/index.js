@@ -21,11 +21,15 @@ const router = createRouter({
       component: Register,
     },
     {
-      path: '/profile',
+      path: '/profile/:id',
       component: Profile,
     },
     {
       path: '/create-post',
+      component: CreatePost,
+    },
+    {
+      path: '/edit-post/:id',
       component: CreatePost,
     },
   ],

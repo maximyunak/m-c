@@ -1,49 +1,57 @@
-class Api {
-  constructor() {
-    this.baseUrl = 'https://gsuppriigehp.buymysite.ru/api-of'
-  }
+async function handleResponse(response) {
+  if (response.status >= 200 && response.status < 400) {
+    try {
+      const data = await response.json()
 
-  getToken() {
-    return localStorage.getItem('token')
-  }
+      if (data.data) return data.data
 
-  async request(endpoint, options = {}) {
-    const token = this.getToken()
-
-    const headers = {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...options.headers,
+      return data
+    } catch (err) {
+      return true
     }
+  } else if (response.status >= 400 && response.status <= 500) {
+    const data = await response.json()
+    let message = []
 
-    const res = await fetch(`${this.baseUrl}${endpoint}`, {
-      ...options,
-      headers,
-      // mode: 'no-cors',
-    }).catch((err) => {
-      throw new Error(err || 'Ошибка api')
-    })
-    return res
-  }
+    if (data.message) message.push(data.message)
+    if (data.errors) message.push(Object.values(data.errors))
 
-  get(endpoint) {
-    return this.request(endpoint, {
-      method: 'GET',
-    })
-  }
+    const id = Math.random().toString(36).substr(2, 8)
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      `<span id="${id}" class="notify">${message.join('<br />')}</span>`,
+    )
 
-  post(endpoint, data) {
-    return this.request(endpoint, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    })
-  }
+    const el = document.getElementById(id)
 
-  delete(endpoint) {
-    return this.request(endpoint, {
-      method: 'DELETE',
-    })
+    setTimeout(() => {
+      el.classList.add('active')
+      setTimeout(() => {
+        el.classList.remove('active')
+        setTimeout(() => {
+          el.remove()
+        }, 100)
+      }, 3000)
+    }, 100)
+
+    return { data, error: true }
+  } else {
+    alert('Server error')
   }
 }
 
-export default new Api()
+export default async function $fetch(path, method = 'get', body = null) {
+  const url = new URL('https://gsuppriigehp.buymysite.ru/api-of' + path)
+
+  const headers = {
+    Authorization: `Bearer ${localStorage.getItem('token')}`,
+  }
+
+  if (!body || method === 'get') {
+    url.search = new URLSearchParams(body ?? {}).toString()
+
+    return await handleResponse(await fetch(url, { method, headers }))
+  }
+
+  return await handleResponse(await fetch(url, { method, body, headers }))
+}
