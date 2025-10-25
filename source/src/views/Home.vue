@@ -10,10 +10,19 @@ const token = computed(() => store.value)
 
 const route = useRoute()
 
+const search = ref("");
+
 const get = async () => {
   posts.value = await $fetch(`/posts`, 'get', {
     page: route.query.page || 1,
+    search: search.value
   })
+}
+
+const debounceGet = () => {
+  setTimeout(() => {
+    get();
+  }, 500);
 }
 
 const like = async (id, liked_it) => {
@@ -26,8 +35,9 @@ const like = async (id, liked_it) => {
 }
 onMounted(() => get())
 watch(
-  () => route.query.page,
-  () => get(),
+  [() => route.query.page,
+  search],
+  () => debounceGet(),
 )
 </script>
 
@@ -50,7 +60,7 @@ watch(
 
     <div class="search-container">
       <i class="fas fa-search search-icon"></i>
-      <input type="text" class="search-input" placeholder="Поиск по заголовку..." />
+      <input v-model="search" type="text" class="search-input" placeholder="Поиск по заголовку..." />
     </div>
 
     <div class="posts-grid">
